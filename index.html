@@ -7,13 +7,37 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #0d0d0d;
+      color: #e7e7e7;
       padding: 20px;
     }
     h1 {
       text-align: center;
       margin-bottom: 30px;
+      color: #fff;
     }
+    .categories {
+      max-width: 600px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .category-btn {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.25s;
+      color: #ddd;
+    }
+    .category-btn:hover {
+      background: #333;
+      transform: scale(1.05);
+    }
+
     .file-list {
       max-width: 600px;
       margin: 0 auto;
@@ -21,58 +45,100 @@
       flex-direction: column;
       gap: 15px;
     }
+
     .file-item {
-      background: white;
+      background: #1a1a1a;
       padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-radius: 14px;
+      border: 1px solid #333;
+      box-shadow: 0 0 10px rgba(255,255,255,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeIn 0.4s forwards;
     }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     button {
       padding: 8px 16px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      background: #007bff;
+      background: #0051ff;
       color: white;
       font-size: 14px;
+      transition: 0.25s;
     }
+
     button:hover {
-      background: #0056c1;
+      background: #003ec7;
+      transform: scale(1.07);
     }
   </style>
 </head>
 <body>
   <h1>Архив файлов</h1>
 
+  <div class="categories" id="categoryButtons"></div>
+
   <div class="file-list" id="fileList"></div>
 
   <script>
-    // ======== ДОБАВЛЯЙ ФАЙЛЫ ТУТ ========
-    // Просто добавь в массив новый объект: { name: "Название", url: "путь_к_файлу" }
+    // ======== ФАЙЛЫ С КАТЕГОРИЯМИ ========
     const files = [
-      { name: "Пример документа.pdf", url: "files/doc1.pdf" },
-      { name: "Фото.png", url: "files/photo.png" }
+      { name: "Документ.pdf", url: "files/doc.pdf", category: "Документы" },
+      { name: "Фото.png", url: "files/photo.png", category: "Изображения" },
+      { name: "Архив.zip", url: "files/archive.zip", category: "Архивы" },
+      { name: "Схема.jpg", url: "files/schema.jpg", category: "Изображения" }
     ];
-    // ===================================
+    // =====================================
 
     const fileList = document.getElementById("fileList");
+    const categoryButtons = document.getElementById("categoryButtons");
 
-    files.forEach(file => {
-      const div = document.createElement("div");
-      div.className = "file-item";
+    const categories = [...new Set(files.map(f => f.category))];
 
-      div.innerHTML = `
-        <span>${file.name}</span>
-        <a href="${file.url}" download>
-          <button>Скачать</button>
-        </a>
-      `;
+    function renderCategories() {
+      categoryButtons.innerHTML = '<button class="category-btn" onclick="renderFiles()">Все</button>';
 
-      fileList.appendChild(div);
-    });
+      categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "category-btn";
+        btn.innerText = cat;
+        btn.onclick = () => renderFiles(cat);
+        categoryButtons.appendChild(btn);
+      });
+    }
+
+    function renderFiles(filter = null) {
+      fileList.innerHTML = "";
+      const filtered = filter ? files.filter(f => f.category === filter) : files;
+
+      filtered.forEach(file => {
+        const div = document.createElement("div");
+        div.className = "file-item";
+
+        div.innerHTML = `
+          <span>${file.name}</span>
+          <a href="${file.url}" download>
+            <button>Скачать</button>
+          </a>
+        `;
+
+        fileList.appendChild(div);
+      });
+    }
+
+    renderCategories();
+    renderFiles();
   </script>
 </body>
 </html>
